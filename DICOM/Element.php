@@ -130,8 +130,8 @@ class File_DICOM_Element
     {
         // Tag holds group and element numbers in two bytes each.
         $offset  = ftell($IN);
-        $group   = $this->_readInt($IN, 2);
-        $element = $this->_readInt($IN, 2);
+        $group   = $this->_readInt($IN, 2, 2);
+        $element = $this->_readInt($IN, 2, 2);
         // Next 4 bytes are either explicit VR or length (implicit VR).
         $length = $this->_readLength($IN);
   
@@ -157,12 +157,13 @@ class File_DICOM_Element
                 case 'US':
                     $value = $this->_readInt($IN, 2, $length);
                     break;
-                // Certain VRs not yet implemented: Single and double precision floats.
                 case 'FL':
-                    print "Unsupported VR: FL\n";
+                    // TODO: test this
+                    $value = $this->_readFloat($IN, 4, $length);
                     break;
                 case 'FD':
-                    print "Unsupported VR: FD\n";
+                    // TODO: test this
+                    $value = $this->_readFloat($IN, 8, $length);
                     break;
                 // Binary data. Only save position. Is this right? 
                 case 'OW':
@@ -243,7 +244,7 @@ class File_DICOM_Element
                     $this->vr_type = FILE_DICOM_VR_TYPE_EXPLICIT_32_BITS;
                     // This is an OB, OW, SQ, UN or UT: 32 bit VL field.
                     // Have seen in some files length 0xffff here...
-                    return $this->_readInt($IN, 4);
+                    return $this->_readInt($IN, 4, 4);
                 } else {
                     // This is an explicit VR with 16 bit length.
                     $this->vr_type = FILE_DICOM_VR_TYPE_EXPLICIT_16_BITS;
@@ -268,12 +269,46 @@ class File_DICOM_Element
     * @param integer  $len   Optional total number of bytes on the field
     * @return mixed integer value if $len == $bytes, an array of integer if $len > $bytes
     */
-    function _readInt($IN, $bytes, $len = null)
+    function _readInt($IN, $bytes, $len)
     {
         $format = ($bytes == 2) ? "v" : "V";
-        if (!isset($len)) {
-            $len = $bytes;
+  
+        $buff = fread($IN, $len);
+        if ($len == $bytes) {
+            if (strlen($buff) > 0) {
+                $val = unpack($format, $buff);
+                return $val[''];
+            } else {
+                return '';
+            }
+        } else {
+            // Multiple values: Create array.
+            // Change this!!!
+            $vals = array();
+            for ($pos = 0; $pos < $len; $pos += $bytes) {
+                $unpacked = unpack("$format", substr($buff, $pos, $bytes));
+                $vals[] = $unpacked[''];
+            }
+            $val = "[" . join(", ", $vals) . "]";
+            return $val;
         }
+    }
+
+    /**
+    * Read a float field from a file handle
+    * If $len > $bytes multiple values are read in and
+    * stored as a string representation of an array.
+    * This method will probably change in the future.
+    *
+    * @access private
+    * @param resource $IN filehandle for the file currently being parsed
+    * @param integer  $bytes Number of bytes for float (4 => float, 8 => double)
+    * @param integer  $len   Total number of bytes on the field
+    * @return mixed double value if $len == $bytes, an array of doubles if $len > $bytes
+    */
+    function _readFloat($IN, $bytes, $len)
+    {
+        $format = ($bytes == 4) ? 'f' : 'd';
   
         $buff = fread($IN, $len);
         if ($len == $bytes) {
