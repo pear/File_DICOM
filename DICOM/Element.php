@@ -143,7 +143,7 @@ class File_DICOM_Element
         if (isset($dictref[$group][$element])) {
             list($code, $numa, $name) = $dictref[$group][$element];
         } else {
-            list($code, $numa, $name) = array("--", "UNKNOWN");
+            list($code, $numa, $name) = array("--", "UNKNOWN", "UNKNOWN");
         }
   
         // Read in the value field.  Certain fields need to be decoded.
@@ -238,7 +238,7 @@ class File_DICOM_Element
         foreach (array_keys($this->VR) as $vr) {
             if ($vrstr == $vr) {
                 // Have a code for an explicit VR: Retrieve VR element
-                list($name, $bytes, $fixed) = $$this->VR[$vr];
+                list($name, $bytes, $fixed) = $this->VR[$vr];
                 if ($bytes == 0) {
                     $this->vr_type = FILE_DICOM_VR_TYPE_EXPLICIT_32_BITS;
                     // This is an OB, OW, SQ, UN or UT: 32 bit VL field.
