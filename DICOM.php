@@ -1843,7 +1843,7 @@ $this->dict[0xFFFE][0xE0DD] = array('NONE','1','SequenceDelimitationItem');
     function parse($infile)
     {
         $this->current_file = $infile;
-        $fh = fopen($infile, "rb");
+        $fh = @fopen($infile, "rb");
         if (!$fh) {
             return $this->raiseError("Could not open file $infile for reading");
         }
@@ -1889,7 +1889,7 @@ $this->dict[0xFFFE][0xE0DD] = array('NONE','1','SequenceDelimitationItem');
                 return $this->raiseError("File name not given (and no file currently open)");
             }
         }
-        $fh = fopen($outfile, "wb");
+        $fh = @fopen($outfile, "wb");
         if (!$fh) {
             return $this->raiseError("Could not open file $outfile for writing");
         }
@@ -1946,7 +1946,7 @@ $this->dict[0xFFFE][0xE0DD] = array('NONE','1','SequenceDelimitationItem');
                     case 'OX':
                         // Binary data. Value only contains position on the parsed file.
                         // Will fail when file name for writing is the same as for parsing.
-                        $fh2 = fopen($this->current_file, "rb");
+                        $fh2 = @fopen($this->current_file, "rb");
                         if (!$fh2) {
                             return $this->raiseError("Could not open file {$this->current_file} for reading");
                         }
@@ -2027,7 +2027,7 @@ $this->dict[0xFFFE][0xE0DD] = array('NONE','1','SequenceDelimitationItem');
         $length = $this->_elements[0x7FE0][0x0010]->length;
         $rows = $this->getValue(0x0028,0x0010);
         $cols = $this->getValue(0x0028,0x0011);
-        $fh = fopen($filename, "wb");
+        $fh = @fopen($filename, "wb");
         if (!$fh) {
             return $this->raiseError("Could not open file $filename for writing");
         }
@@ -2040,7 +2040,7 @@ $this->dict[0xFFFE][0xE0DD] = array('NONE','1','SequenceDelimitationItem');
         // always 255 grays
         fwrite($fh, "255\n");
         $pos = $this->getValue(0x7FE0,0x0010);
-        $fh_in = fopen($this->current_file, "rb");
+        $fh_in = @fopen($this->current_file, "rb");
         if (!$fh_in) {
             return $this->raiseError("Could not open file {$this->current_file} for reading");
         }
