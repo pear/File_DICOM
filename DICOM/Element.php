@@ -127,7 +127,8 @@ class File_DICOM_Element extends PEAR
 
     /**
     * Create DICOM file element from contents of the file given.
-    * Assumed element begins at current position of file pointer
+    * It assumes the element begins at the current position of the given 
+    * file pointer.
     *
     * @param resource $IN       File handle for the file currently being parsed
     * @param array    &$dictref Reference to the dictionary of DICOM headers

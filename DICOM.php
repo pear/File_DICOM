@@ -1821,14 +1821,15 @@ array(0xFFFE,0xE0DD,'NONE','1','SequenceDelimitationItem')
     var $_elements;
 
     /**
-    * Initialize dictionary only once.
-    * Read the contents of the DICOM dictionary into a hash by group and element.
-    * dicom_private is read after dicom_fields, so overrides common fields.
+    * Constructor.
+    * It creates a File_DICOM object.
     *
     * @access public
     */
     function File_DICOM()
     {
+        // initialize dictionary (find a better way to do this)
+        // dicom_private is read after dicom_fields, so overrides common fields
         foreach ($this->dicom_fields as $field) {
             list($group, $elem, $code, $numa, $name) = $field;
             $this->dict[$group][$elem] = array($code, $name);
@@ -1836,7 +1837,8 @@ array(0xFFFE,0xE0DD,'NONE','1','SequenceDelimitationItem')
     }
 
     /**
-    * Fill in hash with header members from given file.
+    * Parse a DICOM file
+    * Parse a DICOM file and get all of its header members
     *
     * @access public
     * @param string $infile The DICOM file to parse
@@ -1861,7 +1863,9 @@ array(0xFFFE,0xE0DD,'NONE','1','SequenceDelimitationItem')
             fseek($fh, 0);
         }
   
-        while (ftell($fh) < $this->_file_length) {
+        // Fill in hash with header members from given file.
+        while (ftell($fh) < $this->_file_length)
+        {
             $element = new File_DICOM_Element($fh, $this->dict);
             $gp = $element->group;
             $el = $element->element;
@@ -1872,12 +1876,13 @@ array(0xFFFE,0xE0DD,'NONE','1','SequenceDelimitationItem')
     }
 
     /**
-    * Write current contents to a file.
+    * Write current contents to a DICOM file.
     *
     * @access public
-    * @param string $outfile The name of the file to write. If not given it assumes
-    *                        the name of the file parsed. If no file was parsed 
-    *                        and no name is given returns a PEAR_Error
+    * @param string $outfile The name of the file to write. If not given 
+    *                        it assumes the name of the file parsed.
+    *                        If no file was parsed and no name is given
+    *                        returns a PEAR_Error
     * @return mixed true on success, PEAR_Error on failure
     */
     function write($outfile = '')
@@ -1966,10 +1971,13 @@ array(0xFFFE,0xE0DD,'NONE','1','SequenceDelimitationItem')
 
     /**
     * Gets the value for a DICOM element
+    * Gets the value for a DICOM element of a given group from the
+    * parsed DICOM file.
     *
     * @access public
     * @param integer $gp The group the DICOM element belongs to
-    * @param integer $el The identifier for the DICOM element (unique inside a group)
+    * @param integer $el The identifier for the DICOM element
+    *                    (unique inside a group)
     * @return mixed The value for the DICOM element on success, PEAR_Error on failure 
     */
     function getValue($gp, $el)
