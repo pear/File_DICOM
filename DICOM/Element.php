@@ -18,15 +18,13 @@
 //
 // $Id$
 
-require_once('PEAR.php');
-
 /**
 * This class defines DICOM file elements
 *
 * @author   Xavier Noguer <xnoguer@php.net>
 * @package  File_DICOM
 */
-class File_DICOM_Element extends PEAR
+class File_DICOM_Element
 {
     /**
     * Value Representations (DICOM Standard PS 3.5 Sect 6.2)
@@ -64,12 +62,6 @@ class File_DICOM_Element extends PEAR
 'US' => array('Unsigned Short',2,1),
 'UT' => array('Unlimited Text',0,0)
                    );
-
-    /**
-    * Array of fieldnames
-    * @var array
-    */
-    var $fieldnames = array('group','element','offset','name');
 
     /**
     * Type of VR for this element
@@ -149,9 +141,9 @@ class File_DICOM_Element extends PEAR
         $header = fread($IN, $diff);
   
         if (isset($dictref[$group][$element])) {
-            list($code,$name) = $dictref[$group][$element];
+            list($code, $numa, $name) = $dictref[$group][$element];
         } else {
-            list($code, $name) = array("--", "UNKNOWN");
+            list($code, $numa, $name) = array("--", "UNKNOWN");
         }
   
         // Read in the value field.  Certain fields need to be decoded.
@@ -190,10 +182,11 @@ class File_DICOM_Element extends PEAR
         $this->code   = $code;
         $this->length = $length;
         // why save header??
-        $this->header = $header;
-        foreach ($this->fieldnames as $var) {
-            $this->$var = $$var;
-        }
+        $this->header  = $header;
+        $this->element = $element;
+        $this->group   = $group;
+        $this->name    = $name;
+        $this->offset  = $offset;
     }
 
     /**
