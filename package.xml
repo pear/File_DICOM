@@ -17,11 +17,14 @@
     </maintainer>
   </maintainers>
   <release>
-    <version>0.1</version>
-    <date>2003-05-20</date>
+    <version>0.2</version>
+    <date>2003-09-09</date>
     <license>LGPL</license>
-    <state>alpha</state>
-    <notes>first release.</notes>
+    <state>beta</state>
+    <notes>
+      -File_DICOM::getValue() now accepts element names as argument.
+      -General code clean up.
+    </notes>
     <provides type="class" name="File_DICOM" extends="PEAR" />
     <provides type="function" name="File_DICOM::parse" />
     <provides type="function" name="File_DICOM::write" />
@@ -35,4 +38,12 @@
       <file role="php" baseinstalldir="File/" md5sum="578cb25f4aad88b178a4d9178213e1cd" name="DICOM/Element.php"/>
     </filelist>
   </release>
+  <changelog>
+    <release>
+      <version>0.1</version>
+      <date>2003-05-20</date>
+      <notes>first release.</notes>
+      <state>alpha</state>
+    </release>
+  </changelog>
 </package>
