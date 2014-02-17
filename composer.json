@@ -1,0 +1,25 @@
+{
+    "authors": [
+        {
+            "email": "xnoguer@php.net",
+            "name": "Xavier Noguer",
+            "role": "Lead"
+        }
+    ],
+    "autoload": {
+        "classmap": [
+            "./"
+        ]
+    },
+    "description": "More info available on: http://pear.php.net/package/File_DICOM",
+    "license": "LGPL",
+    "name": "pear/file_dicom",
+    "support": {
+        "issues": "http:///bugs/search.php?cmd=display&package_name[]=File_DICOM",
+        "source": "https://github.com/pear/File_DICOM"
+    },
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    }
+}
