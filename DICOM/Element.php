@@ -34,88 +34,88 @@ class File_DICOM_Element
     * @var array
     */
     
-    var $VR = array(
-'AE' => array('Application Entity',16,0),
-'AS' => array('Age String',4,1),
-'AT' => array('Attribute Tag',4,1),
-'CS' => array('Code String',16,0),
-'DA' => array('Date',8,1),
-'DS' => array('Decimal String',16,0),
-'DT' => array('Date Time',26,0),
-'FL' => array('Floating Point Single',4,1),
-'FD' => array('Floating Point Double',8,1),
-'IS' => array('Integer String',12,0),
-'LO' => array('Long Strong',64,0),
-'LT' => array('Long Text',10240,0),
-'OB' => array('Other Byte String',0,0),
-'OW' => array('Other Word String',0,0),
-'PN' => array('Person Name',64,0),
-'SH' => array('Short String',16,0),
-'SL' => array('Signed Long',4,1),
-'SQ' => array('Sequence of Items',0,0),
-'SS' => array('Signed Short',2,1),
-'ST' => array('Short Text',1024,0),
-'TM' => array('Time',16,0),
-'UI' => array('Unique Identifier UID',64,0),
-'UL' => array('Unsigned Long',4,1),
-'UN' => array('Unknown',0,0),
-'US' => array('Unsigned Short',2,1),
-'UT' => array('Unlimited Text',0,0)
-                   );
+    var $VR = [
+        'AE' => ['Application Entity', 16, 0],
+        'AS' => ['Age String', 4, 1],
+        'AT' => ['Attribute Tag', 4, 1],
+        'CS' => ['Code String', 16, 0],
+        'DA' => ['Date', 8, 1],
+        'DS' => ['Decimal String', 16, 0],
+        'DT' => ['Date Time', 26, 0],
+        'FL' => ['Floating Point Single', 4, 1],
+        'FD' => ['Floating Point Double', 8, 1],
+        'IS' => ['Integer String', 12, 0],
+        'LO' => ['Long Strong', 64, 0],
+        'LT' => ['Long Text', 10240, 0],
+        'OB' => ['Other Byte String', 0, 0],
+        'OW' => ['Other Word String', 0, 0],
+        'PN' => ['Person Name', 64, 0],
+        'SH' => ['Short String', 16, 0],
+        'SL' => ['Signed Long', 4, 1],
+        'SQ' => ['Sequence of Items', 0, 0],
+        'SS' => ['Signed Short', 2 ,1],
+        'ST' => ['Short Text', 1024, 0],
+        'TM' => ['Time', 16, 0],
+        'UI' => ['Unique Identifier UID', 64, 0],
+        'UL' => ['Unsigned Long', 4, 1],
+        'UN' => ['Unknown', 0, 0],
+        'US' => ['Unsigned Short', 2, 1],
+        'UT' => ['Unlimited Text', 0, 0],
+    ];
 
     /**
     * Type of VR for this element
-    * @var integer
+    * @var int
     */
-    var $vr_type;
+    protected $vrType;
 
     /**
     * Element length
-    * @var integer
+    * @var int
     */
-    var $value;
+    protected $value;
 
     /**
     * Element length
-    * @var integer
+    * @var int
     */
-    var $code;
+    protected $code;
 
     /**
     * Element length
-    * @var integer
+    * @var int
     */
-    var $length;
+    protected $length;
 
     /**
     * Complete header of this element. It might disappear in the future.
     * @var string
     */
-    var $header;
+    protected $header;
 
     /**
     * Group this element belongs to
-    * @var integer
+    * @var int
     */
-    var $group;
+    protected $group;
 
     /**
     * Element identifier
-    * @var integer
+    * @var int
     */
-    var $element;
+    protected $element;
 
     /**
     * Position inside the current field for the element
-    * @var integer
+    * @var int
     */
-    var $offset;
+    protected $offset;
  
     /**
     * Name for this element
-    * @var string
+    * @var int
     */
-    var $name;
+    protected $name;
 
     /**
     * Create DICOM file element from contents of the file given.
@@ -124,16 +124,15 @@ class File_DICOM_Element
     *
     * @param resource $IN       File handle for the file currently being parsed
     * @param array    &$dictref Reference to the dictionary of DICOM headers
-    * @access public
     */
-    function File_DICOM_Element($IN, &$dictref)
+    public function File_DICOM_Element($IN, &$dictref)
     {
         // Tag holds group and element numbers in two bytes each.
         $offset  = ftell($IN);
-        $group   = $this->_readInt($IN, 2, 2);
-        $element = $this->_readInt($IN, 2, 2);
+        $group   = $this->readInt($IN, 2, 2);
+        $element = $this->readInt($IN, 2, 2);
         // Next 4 bytes are either explicit VR or length (implicit VR).
-        $length = $this->_readLength($IN);
+        $length = $this->readLength($IN);
   
         // Go to record start, read bytes up to value field, store in header.
         $diff = ftell($IN) - $offset;
@@ -152,18 +151,18 @@ class File_DICOM_Element
             switch ($code) {
                 // Decode ints and shorts.
                 case 'UL':
-                    $value = $this->_readInt($IN, 4, $length);
+                    $value = $this->readInt($IN, 4, $length);
                     break;
                 case 'US':
-                    $value = $this->_readInt($IN, 2, $length);
+                    $value = $this->readInt($IN, 2, $length);
                     break;
                 case 'FL':
                     // TODO: test this
-                    $value = $this->_readFloat($IN, 4, $length);
+                    $value = $this->readFloat($IN, 4, $length);
                     break;
                 case 'FD':
                     // TODO: test this
-                    $value = $this->_readFloat($IN, 8, $length);
+                    $value = $this->readFloat($IN, 8, $length);
                     break;
                 // Binary data. Only save position. Is this right? 
                 case 'OW':
@@ -196,10 +195,10 @@ class File_DICOM_Element
     * Explicit VR: 2 bytes hold VR, then 2 byte length.
     *
     * @param resource $IN File handle for the file currently being parsed
-    * @access private
+     *
     * @return integer The length for the current field
     */
-    function _readLength($IN)
+    private function readLength($IN)
     {
         // Read 4 bytes into b0, b1, b2, b3.
         $buff = fread($IN, 4);
@@ -237,23 +236,24 @@ class File_DICOM_Element
         # |<Group-->|<Element>|<Length----------->|<Value->
   
         foreach (array_keys($this->VR) as $vr) {
-            if ($vrstr == $vr) {
+            if ($vrstr === $vr) {
                 // Have a code for an explicit VR: Retrieve VR element
                 list($name, $bytes, $fixed) = $this->VR[$vr];
-                if ($bytes == 0) {
-                    $this->vr_type = FILE_DICOM_VR_TYPE_EXPLICIT_32_BITS;
+                if (0 === $bytes) {
+                    $this->vrType = FILE_DICOM_VR_TYPE_EXPLICIT_32_BITS;
                     // This is an OB, OW, SQ, UN or UT: 32 bit VL field.
                     // Have seen in some files length 0xffff here...
-                    return $this->_readInt($IN, 4, 4);
-                } else {
-                    // This is an explicit VR with 16 bit length.
-                    $this->vr_type = FILE_DICOM_VR_TYPE_EXPLICIT_16_BITS;
-                    return ($b[4] << 8) + $b[3];
+                    return $this->readInt($IN, 4, 4);
                 }
+                // This is an explicit VR with 16 bit length.
+                $this->vrType = FILE_DICOM_VR_TYPE_EXPLICIT_16_BITS;
+
+                return ($b[4] << 8) + $b[3];
             }
         }
         // Made it to here: Implicit VR, 32 bit length.
-        $this->vr_type = FILE_DICOM_VR_TYPE_IMPLICIT;
+        $this->vrType = FILE_DICOM_VR_TYPE_IMPLICIT;
+
         return ($b[4] << 24) + ($b[3] << 16) + ($b[2] << 8) + $b[1];
     }
 
@@ -263,33 +263,34 @@ class File_DICOM_Element
     * stored as a string representation of an array.
     * This method will probably change in the future.
     *
-    * @access private
     * @param resource $IN filehandle for the file currently being parsed
     * @param integer  $bytes Number of bytes for integer (2 => short, 4 => integer)
     * @param integer  $len   Optional total number of bytes on the field
+     *
     * @return mixed integer value if $len == $bytes, an array of integer if $len > $bytes
     */
-    function _readInt($IN, $bytes, $len)
+    private function readInt($IN, $bytes, $len)
     {
-        $format = ($bytes == 2) ? "v" : "V";
+        $format = (2 === $bytes) ? "v" : "V";
   
         $buff = fread($IN, $len);
-        if ($len == $bytes) {
+        if ($len === $bytes) {
             if (strlen($buff) > 0) {
                 $val = unpack($format, $buff);
                 return $val[''];
-            } else {
-                return '';
             }
+
+            return '';
         } else {
             // Multiple values: Create array.
             // Change this!!!
-            $vals = array();
+            $vals = [];
             for ($pos = 0; $pos < $len; $pos += $bytes) {
                 $unpacked = unpack("$format", substr($buff, $pos, $bytes));
                 $vals[] = $unpacked[''];
             }
-            $val = "[" . join(", ", $vals) . "]";
+            $val = "[".join(", ", $vals)."]";
+
             return $val;
         }
     }
@@ -300,33 +301,35 @@ class File_DICOM_Element
     * stored as a string representation of an array.
     * This method will probably change in the future.
     *
-    * @access private
     * @param resource $IN filehandle for the file currently being parsed
     * @param integer  $bytes Number of bytes for float (4 => float, 8 => double)
     * @param integer  $len   Total number of bytes on the field
+    *
     * @return mixed double value if $len == $bytes, an array of doubles if $len > $bytes
     */
-    function _readFloat($IN, $bytes, $len)
+    private function readFloat($IN, $bytes, $len)
     {
-        $format = ($bytes == 4) ? 'f' : 'd';
+        $format = (4 === $bytes) ? 'f' : 'd';
   
         $buff = fread($IN, $len);
-        if ($len == $bytes) {
+        if ($len === $bytes) {
             if (strlen($buff) > 0) {
                 $val = unpack($format, $buff);
+
                 return $val[''];
-            } else {
-                return '';
             }
+
+            return '';
         } else {
             // Multiple values: Create array.
             // Change this!!!
-            $vals = array();
+            $vals = [];
             for ($pos = 0; $pos < $len; $pos += $bytes) {
                 $unpacked = unpack("$format", substr($buff, $pos, $bytes));
                 $vals[] = $unpacked[''];
             }
-            $val = "[" . join(", ", $vals) . "]";
+            $val = "[".join(", ", $vals)."]";
+
             return $val;
         }
     }
@@ -334,12 +337,10 @@ class File_DICOM_Element
     /**
     * Retrieves the value field for this File_DICOM_Element
     *
-    * @access public
     * @return mixed The value for this File_DICOM_Element
     */
-    function getValue()
+    public function getValue()
     {
         return $this->value;
     }
 }
-?>
